@@ -2,7 +2,7 @@
   "name": "drum-drum",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://padnabrand.github.io/drum-drum",
+  "homepage": "https://pandabrand.github.io/drum-drum",
   "dependencies": {
     "gh-pages": "^1.1.0",
     "react": "^16.3.2",

@@ -27,6 +27,10 @@ class App extends Component {
         const key = document.querySelector( `.key[data-key="${e.keyCode}"]` );
         if(!key)
             return;
+        if(audioContext.state === 'suspended') {
+            audioContext.resume();  
+        }
+
         const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
         var source = audioContext.createBufferSource(); // creates a sound source
         source.buffer = audio.buffer;                    // tell the source which sound to play

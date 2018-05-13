@@ -6,8 +6,14 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 class App extends Component {
 
+    constructor(props) {
+        super(props);
+
+        this.keySoundTrigger = this.keySoundTrigger.bind(this);
+        this.playSound = this.playSound.bind(this);
+    }
     componentDidMount() {
-        window.addEventListener( 'keydown', this.playSound );
+        window.addEventListener( 'keydown', this.keySoundTrigger );
         sounds.forEach((obj) => {
             var request = new XMLHttpRequest();
             request.open('GET', 'sounds/'+obj.sound, true);
@@ -23,20 +29,27 @@ class App extends Component {
         });
     }
 
-    playSound( e ) {
+    keySoundTrigger( e ) {
         const key = document.querySelector( `.key[data-key="${e.keyCode}"]` );
-        if(!key)
+        if(!key) {
             return;
+        }
+        else {
+            const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
+            this.playSound(audio, 0);
+            key.classList.add('playing');
+        }
+    }
+
+    playSound( sound, time ) {
         if(audioContext.state === 'suspended') {
             audioContext.resume();  
         }
 
-        const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
         var source = audioContext.createBufferSource(); // creates a sound source
-        source.buffer = audio.buffer;                    // tell the source which sound to play
+        source.buffer = sound.buffer;                    // tell the source which sound to play
         source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
-        source.start(0);                           // play the source now
-        key.classList.add('playing');
+        source.start(time);                           // play the source now
     }
 
     render() {

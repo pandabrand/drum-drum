@@ -13,7 +13,9 @@ class App extends Component {
         this.state = {
             volume: 0.7,
             tempo: 90,
-            loop: false
+            loop: false,
+            loop_playing: false,
+            curbeat: 0
         };
 
         this.keySoundTrigger = this.keySoundTrigger.bind(this);
@@ -57,19 +59,27 @@ class App extends Component {
         else {
             const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
             if(audio.letter === 'SPACE') {
-                this.setState({
-                    loop: !this.state.loop
-                });
-                console.log(this.state.loop);
-                this.playLoop();
+                if(!this.state.loop) {
+                    this.setState({
+                        loop: !this.state.loop,
+                        curbeat: 0,
+                        loop_playing: setInterval(this.playLoop, 60000 / this.state.tempo / 4)
+                    });
+                } else {
+                    clearInterval(this.state.loop_playing);
+                    this.setState({
+                        loop: !this.state.loop,
+                        loop_playing: false
+                    });
+                }
             } else {
-                this.playSound(audio, 0);
+                this.playSound(audio);
             }
             key.classList.add('playing');
         }
     }
 
-    playSound( sound, time ) {
+    playSound( sound, time = 0 ) {
         if(audioContext.state === 'suspended') {
             audioContext.resume();  
         }
@@ -88,38 +98,38 @@ class App extends Component {
 
     changeTempo( e ) {
         const new_tempo = e.target.value;
-        this.setState({tempo : new_tempo});
+        clearInterval(this.state.loop_playing);
+        this.setState({
+            tempo : new_tempo,
+            loop_playing: setInterval(this.playLoop, 60000 / new_tempo / 4)
+        });
     }
 
     getEighthNoteTime() {
-        return (60 / this.state.tempo) / 2;
+        return (60000 / this.state.tempo) / 4;
     }
 
     playLoop() {
-        var kick = sounds.find( (obj) => obj.kCode === 68 );
-        var snare = sounds.find( (obj) => obj.kCode === 74 );
+        var kick = sounds.find( (obj) => obj.kCode === 71 );
+        var snare = sounds.find( (obj) => obj.kCode === 76 );
         var hihat = sounds.find( (obj) => obj.kCode === 83 );
-      
-        // We'll start playing the rhythm 100 milliseconds from "now"
-        var startTime = audioContext.currentTime + 0.100;
-        // var tempo = this.state.tempo; // BPM (beats per minute)
-        // var eighthNoteTime = (60 / this.state.tempo) / 2;
-      
-        // Play 4 bars of the following:
-        for (var bar = 0; bar < 4; bar++) {
-          var time = startTime + bar * 8 * this.getEighthNoteTime();
-          // Play the bass (kick) drum on beats 1, 5
-          this.playSound(kick, time);
-          this.playSound(kick, time + 4 * this.getEighthNoteTime());
-      
-          // Play the snare drum on beats 3, 7
-          this.playSound(snare, time + 2 * this.getEighthNoteTime());
-          this.playSound(snare, time + 6 * this.getEighthNoteTime());
-      
-          // Play the hi-hat every eighthh note.
-          for (var i = 0; i < 8; ++i) {
-            this.playSound(hihat, time + i * this.getEighthNoteTime());
-          }
+        
+        var loop_pattern = [
+            [kick,hihat],
+            [hihat],
+            [snare,hihat],
+            [hihat],
+            [kick,hihat],
+            [hihat],
+            [snare,hihat],
+            [hihat]            
+        ];
+
+        if(this.state.loop) {
+            loop_pattern[this.state.curbeat].forEach(i => this.playSound(i) );
+            this.setState({
+                curbeat : (this.state.curbeat + 1) % 8
+            });
         }
     } 
 

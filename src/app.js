@@ -3,19 +3,35 @@ import './app.css';
 import DrumKey from'./keys.js';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let gainNode = null;
 
 class App extends Component {
 
     constructor(props) {
         super(props);
 
+        this.state = {
+            volume: 0.7,
+            tempo: 90,
+            loop: false
+        };
+
         this.keySoundTrigger = this.keySoundTrigger.bind(this);
         this.playSound = this.playSound.bind(this);
         this.playLoop = this.playLoop.bind(this);
+        this.changeVolume = this.changeVolume.bind(this);
+        this.changeTempo = this.changeTempo.bind(this);
+        this.getEighthNoteTime = this.getEighthNoteTime.bind(this);
     }
 
     componentDidMount() {
         window.addEventListener( 'keydown', this.keySoundTrigger );
+        //create Gain node and connect to destination
+        gainNode = audioContext.createGain();
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.value = this.state.volume;
+
+
         sounds.forEach((obj) => {
             if(obj.sound) {
                 var request = new XMLHttpRequest();
@@ -41,6 +57,10 @@ class App extends Component {
         else {
             const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
             if(audio.letter === 'SPACE') {
+                this.setState({
+                    loop: !this.state.loop
+                });
+                console.log(this.state.loop);
                 this.playLoop();
             } else {
                 this.playSound(audio, 0);
@@ -56,8 +76,23 @@ class App extends Component {
 
         var source = audioContext.createBufferSource(); // creates a sound source
         source.buffer = sound.buffer;                    // tell the source which sound to play
-        source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+        source.connect(gainNode);       // connect the source to the context's destination (the speakers)
         source.start(time);                           // play the source now
+    }
+
+    changeVolume( e ) {
+        const new_volume = e.target.value;
+        this.setState({volume : new_volume});
+        gainNode.gain.value = this.state.volume;
+    }
+
+    changeTempo( e ) {
+        const new_tempo = e.target.value;
+        this.setState({tempo : new_tempo});
+    }
+
+    getEighthNoteTime() {
+        return (60 / this.state.tempo) / 2;
     }
 
     playLoop() {
@@ -67,23 +102,23 @@ class App extends Component {
       
         // We'll start playing the rhythm 100 milliseconds from "now"
         var startTime = audioContext.currentTime + 0.100;
-        var tempo = 120; // BPM (beats per minute)
-        var eighthNoteTime = (60 / tempo) / 2;
+        // var tempo = this.state.tempo; // BPM (beats per minute)
+        // var eighthNoteTime = (60 / this.state.tempo) / 2;
       
         // Play 4 bars of the following:
         for (var bar = 0; bar < 4; bar++) {
-          var time = startTime + bar * 8 * eighthNoteTime;
+          var time = startTime + bar * 8 * this.getEighthNoteTime();
           // Play the bass (kick) drum on beats 1, 5
           this.playSound(kick, time);
-          this.playSound(kick, time + 4 * eighthNoteTime);
+          this.playSound(kick, time + 4 * this.getEighthNoteTime());
       
           // Play the snare drum on beats 3, 7
-          this.playSound(snare, time + 2 * eighthNoteTime);
-          this.playSound(snare, time + 6 * eighthNoteTime);
+          this.playSound(snare, time + 2 * this.getEighthNoteTime());
+          this.playSound(snare, time + 6 * this.getEighthNoteTime());
       
           // Play the hi-hat every eighthh note.
           for (var i = 0; i < 8; ++i) {
-            this.playSound(hihat, time + i * eighthNoteTime);
+            this.playSound(hihat, time + i * this.getEighthNoteTime());
           }
         }
     } 
@@ -95,6 +130,10 @@ class App extends Component {
                     {sounds.map((obj, idx) => {
                       return  <DrumKey key={idx} {...obj} />;
                     })}
+                </div>
+                <div className="sliders">
+                    <input className="sliders vol-slider" type="range" onChange={this.changeVolume} value={this.state.volume} min="0" max="1" step="0.01"/>
+                    <input className="sliders tempo-slider" type="range" onChange={this.changeTempo} value={this.state.tempo} min="50" max="180" step="1"/>
                 </div>
             </div>
         )

@@ -10,14 +10,20 @@ html {
     font-family: sans-serif;
   }
   
-  .keys {
+  .keys,
+  .sliders {
     display: flex;
     flex: 1;
-    min-height: 100vh;
+    min-height: 70vh;
     align-items: center;
     justify-content: center;
   }
   
+  .sliders {
+    min-height: 30vh;
+    flex: 0 1;
+  }
+
   .key {
     border: .4rem solid black;
     border-radius: .5rem;

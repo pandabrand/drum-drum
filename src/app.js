@@ -1,9 +1,39 @@
 import React, { Component } from 'react';
 import './app.css';
-import DrumKey from'./keys.js';
+import DrumKey from './keys';
+import Pattern from './pattern';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let gainNode = null;
+
+const drumLoopStyles = [
+    {
+        style: 'rock',
+        loop: [
+            ['kick','hihat'],
+            ['hihat'],
+            ['snare','hihat'],
+            ['hihat'],
+            ['kick','hihat'],
+            ['hihat'],
+            ['snare','hihat'],
+            ['hihat']            
+        ]
+    },
+    {
+        style: 'disco',
+        loop: [
+            ['kick','hihat'],
+            ['openhat'],
+            ['kick','snare','hihat'],
+            ['openhat'],
+            ['kick','hihat'],
+            ['openhat'],
+            ['kick','snare','hihat'],
+            ['openhat']            
+        ]
+    }
+];
 
 class App extends Component {
 
@@ -15,7 +45,8 @@ class App extends Component {
             tempo: 90,
             loop: false,
             loop_playing: false,
-            curbeat: 0
+            curbeat: 0,
+            pattern: drumLoopStyles[0]
         };
 
         this.keySoundTrigger = this.keySoundTrigger.bind(this);
@@ -23,7 +54,7 @@ class App extends Component {
         this.playLoop = this.playLoop.bind(this);
         this.changeVolume = this.changeVolume.bind(this);
         this.changeTempo = this.changeTempo.bind(this);
-        this.getEighthNoteTime = this.getEighthNoteTime.bind(this);
+        this.changePattern = this.changePattern.bind(this);
     }
 
     componentDidMount() {
@@ -105,28 +136,20 @@ class App extends Component {
         });
     }
 
-    getEighthNoteTime() {
-        return (60000 / this.state.tempo) / 4;
+    changePattern(e) {
+        const loopPatternObj = drumLoopStyles.find( (obj) => obj.style === e.currentTarget.name );
+
+        this.setState({
+            pattern: loopPatternObj
+        });
     }
 
     playLoop() {
-        var kick = sounds.find( (obj) => obj.kCode === 71 );
-        var snare = sounds.find( (obj) => obj.kCode === 76 );
-        var hihat = sounds.find( (obj) => obj.kCode === 83 );
-        
-        var loop_pattern = [
-            [kick,hihat],
-            [hihat],
-            [snare,hihat],
-            [hihat],
-            [kick,hihat],
-            [hihat],
-            [snare,hihat],
-            [hihat]            
-        ];
-
         if(this.state.loop) {
-            loop_pattern[this.state.curbeat].forEach(i => this.playSound(i) );
+            this.state.pattern.loop[this.state.curbeat].forEach(soundName => {
+                const sound = sounds.find( (obj) =>  obj.name === soundName );
+                this.playSound(sound);
+            } );
             this.setState({
                 curbeat : (this.state.curbeat + 1) % 8
             });
@@ -139,6 +162,11 @@ class App extends Component {
                 <div className="keys">
                     {sounds.map((obj, idx) => {
                       return  <DrumKey key={idx} {...obj} />;
+                    })}
+                </div>
+                <div className="patterns">
+                    {drumLoopStyles.map((obj, idx) => {
+                        return <Pattern key={idx} obj={obj} pattern={this.state.pattern} changePattern={this.changePattern} />
                     })}
                 </div>
                 <div className="sliders">

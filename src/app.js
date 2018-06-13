@@ -2,38 +2,12 @@ import React, { Component } from 'react';
 import './app.css';
 import DrumKey from './keys';
 import Pattern from './pattern';
+import DrumData from './data';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let gainNode = null;
-
-const drumLoopStyles = [
-    {
-        style: 'rock',
-        loop: [
-            ['kick','hihat'],
-            ['hihat'],
-            ['snare','hihat'],
-            ['hihat'],
-            ['kick','hihat'],
-            ['hihat'],
-            ['snare','hihat'],
-            ['hihat']            
-        ]
-    },
-    {
-        style: 'disco',
-        loop: [
-            ['kick','hihat'],
-            ['openhat'],
-            ['kick','snare','hihat'],
-            ['openhat'],
-            ['kick','hihat'],
-            ['openhat'],
-            ['kick','snare','hihat'],
-            ['openhat']            
-        ]
-    }
-];
+const loops = DrumData.loops;
+const sounds = DrumData.sounds;
 
 class App extends Component {
 
@@ -46,7 +20,7 @@ class App extends Component {
             loop: false,
             loop_playing: false,
             curbeat: 0,
-            pattern: drumLoopStyles[0]
+            pattern: loops[0]
         };
 
         this.keySoundTrigger = this.keySoundTrigger.bind(this);
@@ -137,7 +111,7 @@ class App extends Component {
     }
 
     changePattern(e) {
-        const loopPatternObj = drumLoopStyles.find( (obj) => obj.style === e.currentTarget.name );
+        const loopPatternObj = loops.find( (obj) => obj.style === e.currentTarget.name );
 
         this.setState({
             pattern: loopPatternObj
@@ -165,7 +139,7 @@ class App extends Component {
                     })}
                 </div>
                 <div className="patterns">
-                    {drumLoopStyles.map((obj, idx) => {
+                    {loops.map((obj, idx) => {
                         return <Pattern key={idx} obj={obj} pattern={this.state.pattern} changePattern={this.changePattern} />
                     })}
                 </div>
@@ -177,18 +151,5 @@ class App extends Component {
         )
     }
 }
-
-const sounds = [
-    {kCode: 65, sound:'clap.wav', name:'clap', letter:'A'},
-    {kCode: 83, sound:'hihat.wav', name:'hihat', letter:'S'},
-    {kCode: 68, sound:'kick.wav', name:'kick', letter:'D'},
-    {kCode: 70, sound:'openhat.wav', name:'openhat', letter:'F'},
-    {kCode: 71, sound:'boom.wav', name:'boom', letter:'G'},
-    {kCode: 72, sound:'ride.wav', name:'ride', letter:'H'},
-    {kCode: 74, sound:'snare.wav', name:'snare', letter:'J'},
-    {kCode: 75, sound:'tom.wav', name:'tom', letter:'K'},
-    {kCode: 76, sound:'tink.wav', name:'tink', letter:'L'},
-    {kCode: 32, sound:'', name:'play loop', letter:'SPACE'}
-];
 
 export default App;

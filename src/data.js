@@ -89,8 +89,12 @@ const DrumData =
         {kCode: 72, sound:'ride.wav', name:'ride', letter:'H'},
         {kCode: 74, sound:'snare.wav', name:'snare', letter:'J'},
         {kCode: 75, sound:'tom.wav', name:'tom', letter:'K'},
-        {kCode: 76, sound:'tink.wav', name:'tink', letter:'L'},
-        {kCode: 32, sound:'', name:'play loop', letter:'SPACE'}
+        {kCode: 76, sound:'tink.wav', name:'tink', letter:'L'}
+        // {kCode: 32, sound:'', name:'play loop', letter:'SPACE'}
+    ],
+    controls: [
+        {kCode: 32, name:'play', letter:'SPACE'},
+        {kCode: 82, name:'record', letter:'R'}
     ]
 };
 

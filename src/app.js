@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './app.css';
-import DrumKey from './keys';
+import ControlKey from './keys';
 import Pattern from './pattern';
 import DrumData from './data';
 
@@ -8,6 +8,7 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let gainNode = null;
 const loops = DrumData.loops;
 const sounds = DrumData.sounds;
+const controls = DrumData.controls;
 
 class App extends Component {
 
@@ -62,25 +63,32 @@ class App extends Component {
             return;
         }
         else {
-            const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
-            if(audio.letter === 'SPACE') {
-                if(!this.state.loop) {
-                    this.setState({
-                        loop: !this.state.loop,
-                        curbeat: 0,
-                        loop_playing: setInterval(this.playLoop, 60000 / this.state.tempo / 4)
-                    });
-                } else {
-                    clearInterval(this.state.loop_playing);
-                    this.setState({
-                        loop: !this.state.loop,
-                        loop_playing: false
-                    });
-                    const prevPlayingEl = document.querySelector('.playing-now');
-                    if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
-        
+            //Is this a control request
+            const control = controls.find( (obj) => obj.kCode === e.keyCode);
+            if(control) {
+                if(control.letter === 'SPACE') {
+                    if(!this.state.loop) {
+                        this.setState({
+                            loop: !this.state.loop,
+                            curbeat: 0,
+                            loop_playing: setInterval(this.playLoop, 60000 / this.state.tempo / 4)
+                        });
+                    }
+                    else {
+                        clearInterval(this.state.loop_playing);
+                        this.setState({
+                            loop: !this.state.loop,
+                            loop_playing: false
+                        });
+                        const prevPlayingEl = document.querySelector('.playing-now');
+                        if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
+                    }
                 }
-            } else {
+            }
+
+            // Is this a audio control request
+            const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
+            if(audio) {
                 this.playSound(audio);
             }
             key.classList.add('playing');
@@ -146,7 +154,7 @@ class App extends Component {
             <div className="wrapper">
                 <div className="keys">
                     {sounds.map((obj, idx) => {
-                      return  <DrumKey key={idx} {...obj} />;
+                      return  <ControlKey key={idx} {...obj} />;
                     })}
                 </div>
                 <div className="patterns">
@@ -155,14 +163,19 @@ class App extends Component {
                     })}
                 </div>
                 <div className="sliders">
-                    <div class="slider">
+                    <div className="slider">
                         <span>Volume</span>
                         <input className="vol-slider" type="range" onChange={this.changeVolume} value={this.state.volume} min="0" max="1" step="0.01"/>
                     </div>
-                    <div class="slider">
+                    <div className="slider">
                         <span>Tempo</span>
                         <input className="tempo-slider" type="range" onChange={this.changeTempo} value={this.state.tempo} min="50" max="180" step="1"/>
                     </div>
+                </div>
+                <div className="controls">
+                    {controls.map((obj, idx) => {
+                        return <ControlKey key={idx} {...obj} />
+                    })}
                 </div>
             </div>
         )

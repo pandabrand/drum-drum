@@ -8,7 +8,7 @@ class Pattern extends Component {
                 <div><input type="checkbox" name={this.props.obj.style} onChange={this.props.changePattern} checked={this.props.pattern === this.props.obj} /><span>{this.props.obj.style}</span></div>
                 <div className={'pattern-blocks ' + this.props.obj.style}>
                     {this.props.obj.loop.map((arr, idx) => {
-                        return <div className={'pattern-block block-' + idx} data-sounds={arr.join(',')}></div>
+                        return <div key={idx} className={'pattern-block block-' + idx} data-sounds={arr.join(',')}></div>
                     })}
                 </div>
             </div>

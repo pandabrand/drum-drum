@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './app.css';
-import ControlKey from './keys';
+import {ControlKey, DrumKey} from './keys';
 import Pattern from './pattern';
 import DrumData from './data';
 
@@ -30,6 +30,7 @@ class App extends Component {
         this.changeVolume = this.changeVolume.bind(this);
         this.changeTempo = this.changeTempo.bind(this);
         this.changePattern = this.changePattern.bind(this);
+        this.setDrumControl = this.setDrumControl.bind(this);
     }
 
     componentDidMount() {
@@ -66,32 +67,39 @@ class App extends Component {
             //Is this a control request
             const control = controls.find( (obj) => obj.kCode === e.keyCode);
             if(control) {
-                if(control.letter === 'SPACE') {
-                    if(!this.state.loop) {
-                        this.setState({
-                            loop: !this.state.loop,
-                            curbeat: 0,
-                            loop_playing: setInterval(this.playLoop, 60000 / this.state.tempo / 4)
-                        });
-                    }
-                    else {
-                        clearInterval(this.state.loop_playing);
-                        this.setState({
-                            loop: !this.state.loop,
-                            loop_playing: false
-                        });
-                        const prevPlayingEl = document.querySelector('.playing-now');
-                        if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
-                    }
-                }
+                this.setDrumControl(control, key);
             }
 
             // Is this a audio control request
             const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
             if(audio) {
                 this.playSound(audio);
+                key.classList.add('playing');
             }
-            key.classList.add('playing');
+        }
+    }
+
+    setDrumControl( control, key ) {
+        if(control.letter === 'SPACE') {
+            if(!this.state.loop) {
+                this.setState({
+                    loop: !this.state.loop,
+                    curbeat: 0,
+                    loop_playing: setInterval(this.playLoop, 60000 / this.state.tempo / 4)
+                });
+                key.classList.add('playing');
+            }
+            else {
+                clearInterval(this.state.loop_playing);
+                this.setState({
+                    loop: !this.state.loop,
+                    loop_playing: false
+                });
+                const prevPlayingEl = document.querySelector('.playing-now');
+                if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
+                console.log({key});
+                key.classList.remove('playing');
+            }
         }
     }
 
@@ -154,7 +162,7 @@ class App extends Component {
             <div className="wrapper">
                 <div className="keys">
                     {sounds.map((obj, idx) => {
-                      return  <ControlKey key={idx} {...obj} />;
+                      return  <DrumKey key={idx} {...obj} />;
                     })}
                 </div>
                 <div className="patterns">

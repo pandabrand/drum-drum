@@ -155,8 +155,14 @@ class App extends Component {
                     })}
                 </div>
                 <div className="sliders">
-                    <input className="sliders vol-slider" type="range" onChange={this.changeVolume} value={this.state.volume} min="0" max="1" step="0.01"/>
-                    <input className="sliders tempo-slider" type="range" onChange={this.changeTempo} value={this.state.tempo} min="50" max="180" step="1"/>
+                    <div class="slider">
+                        <span>Volume</span>
+                        <input className="vol-slider" type="range" onChange={this.changeVolume} value={this.state.volume} min="0" max="1" step="0.01"/>
+                    </div>
+                    <div class="slider">
+                        <span>Tempo</span>
+                        <input className="tempo-slider" type="range" onChange={this.changeTempo} value={this.state.tempo} min="50" max="180" step="1"/>
+                    </div>
                 </div>
             </div>
         )

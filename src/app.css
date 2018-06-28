@@ -1,7 +1,8 @@
 html {
     font-size: 10px;
-    background: linear-gradient(127deg,  rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 0.7) 70%),
-                linear-gradient(36deg, rgba(22, 165, 190, 0.623), rgba(0,0,0,0.8) 52%);
+    background: linear-gradient(-10deg,  rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0.6) 36%),
+                linear-gradient(36deg, rgba(22, 165, 190, 0.623), rgba(0,0,0,0.8) 92%);
+    height: 100%;
   }
 
   body,html {
@@ -10,20 +11,19 @@ html {
     font-family: sans-serif;
   }
   
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
   .keys,
   .sliders {
     display: flex;
     flex: 1;
-    min-height: 70vh;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
   }
   
-  .sliders {
-    min-height: 30vh;
-    flex: 0 1;
-  }
-
   .key {
     border: .4rem solid black;
     border-radius: .5rem;

@@ -76,6 +76,9 @@ class App extends Component {
                         loop: !this.state.loop,
                         loop_playing: false
                     });
+                    const prevPlayingEl = document.querySelector('.playing-now');
+                    if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
+        
                 }
             } else {
                 this.playSound(audio);
@@ -120,10 +123,18 @@ class App extends Component {
 
     playLoop() {
         if(this.state.loop) {
+            //loop to play all sounds
             this.state.pattern.loop[this.state.curbeat].forEach(soundName => {
                 const sound = sounds.find( (obj) =>  obj.name === soundName );
                 this.playSound(sound);
             } );
+
+            //turn on/off time marker
+            const prevPlayingEl = document.querySelector('.playing-now');
+            if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
+            const currentPlayingEl = document.querySelector(`.${this.state.pattern.style} .block-${this.state.curbeat}`);
+            currentPlayingEl.classList.add('playing-now');
+
             this.setState({
                 curbeat : (this.state.curbeat + 1) % 8
             });

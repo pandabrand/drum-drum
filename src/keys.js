@@ -19,7 +19,7 @@ class DrumKey extends Component {
     
     render() {
         return (
-            <div key={this.props.idx} data-key={this.props.kCode} className="key" onTransitionEnd={this.removeTransition}>
+            <div key={this.props.idx} data-key={this.props.kCode} className="key" onTransitionEnd={this.removeTransition} onClick={this.props.clickArmedSound} >
                 <kbd>{this.props.letter}</kbd>
                 <span className="sound">{this.props.name}</span>
                 <audio data-key={this.props.kCode} src={'sounds/' + this.props.sound} />

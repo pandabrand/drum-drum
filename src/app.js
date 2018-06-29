@@ -17,11 +17,13 @@ class App extends Component {
 
         this.state = {
             volume: 0.7,
-            tempo: 90,
+            tempo: 80,
             loop: false,
             loop_playing: false,
             curbeat: 0,
-            pattern: loops[0]
+            pattern: loops[0],
+            record_armed: false,
+            armed_sound: ''
         };
 
         this.keySoundTrigger = this.keySoundTrigger.bind(this);
@@ -31,6 +33,9 @@ class App extends Component {
         this.changeTempo = this.changeTempo.bind(this);
         this.changePattern = this.changePattern.bind(this);
         this.setDrumControl = this.setDrumControl.bind(this);
+        this.addSoundToPattern = this.addSoundToPattern.bind(this);
+        this.setArmedSound = this.setArmedSound.bind(this);
+        this.clickArmedSound = this.clickArmedSound.bind(this);
     }
 
     componentDidMount() {
@@ -39,7 +44,6 @@ class App extends Component {
         gainNode = audioContext.createGain();
         gainNode.connect(audioContext.destination);
         gainNode.gain.value = this.state.volume;
-
 
         sounds.forEach((obj) => {
             if(obj.sound) {
@@ -73,14 +77,34 @@ class App extends Component {
             // Is this a audio control request
             const audio = sounds.find( (obj) => obj.kCode === e.keyCode );
             if(audio) {
-                this.playSound(audio);
-                key.classList.add('playing');
+                if(this.state.record_armed) {
+                    this.setArmedSound( audio.name, key );
+                } else {
+                    this.playSound(audio);
+                    key.classList.add('playing');
+                }
             }
         }
     }
 
+    setArmedSound(name, key) {
+        const keys = Array.from( document.querySelectorAll('.keys .key') );
+        keys.forEach( (key) => key.classList.remove('armed') );
+        key.classList.add('armed');
+        this.setState({
+            armed_sound: name,
+        });
+    }
+
+    clickArmedSound( e ) {
+        const kCode = e.currentTarget.dataset.key;
+        const key = document.querySelector( `.key[data-key="${kCode}"]` );
+        const audio = sounds.find( (obj) => obj.kCode === Number.parseInt( kCode, 10 ) );
+        this.setArmedSound( audio.name, key );
+    }
+
     setDrumControl( control, key ) {
-        if(control.letter === 'SPACE') {
+        if(control.letter === 'SPACE' && !this.state.record_armed) {
             if(!this.state.loop) {
                 this.setState({
                     loop: !this.state.loop,
@@ -97,8 +121,22 @@ class App extends Component {
                 });
                 const prevPlayingEl = document.querySelector('.playing-now');
                 if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
-                console.log({key});
                 key.classList.remove('playing');
+            }
+        }
+
+        if(control.letter === 'R') {
+            this.setState({
+                record_armed: !this.state.record_armed,
+            });
+            key.classList.toggle('armed');
+
+            if( !this.state.record_armed ) {
+                const keys = Array.from( document.querySelectorAll('.keys .key') );
+                keys.forEach( (key) => key.classList.remove('armed') );
+                this.setState({
+                    armed_sound: '',
+                });
             }
         }
     }
@@ -129,7 +167,7 @@ class App extends Component {
         });
     }
 
-    changePattern(e) {
+    changePattern( e ) {
         const loopPatternObj = loops.find( (obj) => obj.style === e.currentTarget.name );
 
         this.setState({
@@ -157,17 +195,43 @@ class App extends Component {
         }
     } 
 
+    addSoundToPattern( e ) {
+        let checked_pattern = document.querySelectorAll('input[type="checkbox"]:checked')[0];
+        let selected_sound = document.querySelector('.keys .key.armed');
+        let current_time = e.currentTarget;
+        
+        if( this.state.record_armed && checked_pattern.name ===  current_time.dataset.pattern ) {
+            const sound_to_add = sounds.find( (obj) => obj.kCode === Number.parseInt( selected_sound.dataset.key, 10 ) );
+            let loopPatternObj = loops.find( (obj) => obj.style === current_time.dataset.pattern );
+            let loopPatternIdx = loops.findIndex( (obj) => obj.style === current_time.dataset.pattern );
+            let pattern_beat = loopPatternObj.loop[current_time.dataset.index];
+
+            if( !pattern_beat.includes(sound_to_add.name) ) {
+                pattern_beat.push(sound_to_add.name);
+            }
+
+            loopPatternObj.loop[current_time.dataset.index] = pattern_beat;
+            loops[loopPatternIdx] = loopPatternObj;
+
+            this.setState({
+                pattern: loopPatternObj
+            });
+
+            current_time.classList.add('playing-now');
+        }
+    }
+
     render() {
         return (
             <div className="wrapper">
                 <div className="keys">
                     {sounds.map((obj, idx) => {
-                      return  <DrumKey key={idx} {...obj} />;
+                      return  <DrumKey key={idx} {...obj} clickArmedSound={this.clickArmedSound} />;
                     })}
                 </div>
                 <div className="patterns">
                     {loops.map((obj, idx) => {
-                        return <Pattern key={idx} obj={obj} pattern={this.state.pattern} changePattern={this.changePattern} />
+                        return <Pattern key={idx} obj={obj} armed_sound={this.state.armed_sound} pattern={this.state.pattern} changePattern={this.changePattern} addSoundToPattern={this.addSoundToPattern} />
                     })}
                 </div>
                 <div className="sliders">
@@ -182,7 +246,7 @@ class App extends Component {
                 </div>
                 <div className="controls">
                     {controls.map((obj, idx) => {
-                        return <ControlKey key={idx} {...obj} />
+                        return <ControlKey key={idx} {...obj} loop_playing={this.state.loop_playing} />
                     })}
                 </div>
             </div>

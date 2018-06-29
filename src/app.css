@@ -45,6 +45,12 @@ html {
     box-shadow: 0 0 1rem #ffc600;
   }
   
+  .armed {
+    transform: scale(1.1);
+    border-color: #c50f0f;
+    box-shadow: 0 0 1rem #c50f0f;
+  }
+  
   kbd {
     display: block;
     font-size: 2rem;

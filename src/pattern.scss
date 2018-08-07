@@ -1,0 +1,19 @@
+.pattern {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.pattern .pattern-blocks {
+    display: flex;
+}
+
+.pattern-blocks .pattern-block {
+    width: 50px;
+    height: 20px;
+    background-color: gray;
+    border: 1px solid black;
+}
+
+.pattern-block.playing-now {
+    background-color: red;
+}

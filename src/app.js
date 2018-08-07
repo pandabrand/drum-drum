@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import 'normalize.css';
 import './app.css';
 import {ControlKey, DrumKey} from './keys';
 import Pattern from './pattern';
+import Lcd from './lcd';
 import DrumData from './data';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -224,6 +226,9 @@ class App extends Component {
     render() {
         return (
             <div className="wrapper">
+                <div className="controls">
+                    <Lcd />
+                </div>
                 <div className="keys">
                     {sounds.map((obj, idx) => {
                       return  <DrumKey key={idx} {...obj} clickArmedSound={this.clickArmedSound} />;

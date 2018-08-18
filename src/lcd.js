@@ -10,7 +10,7 @@ class Lcd extends Component {
         return (
             <div className="lcd-screen">
                 <div className="lcd-container">
-                    <svg className="tempo-lcd lcd-element-three" viewbox="0 0 614.5 324" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="tempo-lcd lcd-element-three" viewBox="0 0 614.5 324" xmlns="http://www.w3.org/2000/svg">
                         <g className="lcd-0 digit digit-1">
                             <g className="lcd-element top-center">
                             <polygon points="149.5 40 49.5 40 50.9 0 150.9 0 149.5 40"></polygon>
@@ -128,7 +128,7 @@ class Lcd extends Component {
                     </div>
                 </div>
                 <div className="lcd-container">
-                    <svg className="vol-lcd lcd-element-two" viewbox="0 0 402.5 324" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="vol-lcd lcd-element-two" viewBox="0 0 402.5 324" xmlns="http://www.w3.org/2000/svg">
                         <g className="lcd-0 digit digit-7">
                             <g className="lcd-element top-center">
                             <polygon points="149.5 40 49.5 40 50.9 0 150.9 0 149.5 40"></polygon>
@@ -209,7 +209,7 @@ class Lcd extends Component {
                     </div>
                 </div>
                 <div className="lcd-container">
-                    <svg className="lcd-element-one" viewbox="0 0 190 324" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="lcd-element-one" viewBox="0 0 190 324" xmlns="http://www.w3.org/2000/svg">
                         <g className="alpha alpha-a">
                             <g className="lcd-element top-center">
                             <polygon points="149.5 40 49.5 40 50.9 0 150.9 0 149.5 40"></polygon>

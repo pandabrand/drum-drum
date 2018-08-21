@@ -1,0 +1,40 @@
+.control-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-column-gap: 5px;
+  grid-row-gap: 10px;
+  padding: 0 15px;
+  margin-bottom: 10px; }
+
+.control-button-wrapper {
+  display: flex;
+  flex-direction: column; }
+  .control-button-wrapper .label {
+    font-style: italic;
+    font-size: 0.90em;
+    color: #000000;
+    text-align: center;
+    text-transform: uppercase;
+    margin-top: 5px; }
+
+.control-button {
+  height: 40px;
+  padding: 15px 10px 10px;
+  background-color: #141418;
+  border-radius: 5px;
+  color: #f4f4f4;
+  text-align: center;
+  border: 2px solid black; }
+  .control-button.record {
+    border-radius: 40px;
+    width: 40px;
+    margin: 0 auto;
+    background-color: #d73737; }
+  .control-button.play {
+    border-radius: 40px;
+    background-color: #be6432; }
+  .control-button.bank {
+    font-size: 2em;
+    font-weight: bold;
+    background-color: #86b6ce;
+    color: black; }

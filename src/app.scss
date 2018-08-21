@@ -8,7 +8,7 @@ html {
     padding: 0;
     font-family: sans-serif;
   }
-  
+
   .wrapper {
     display: flex;
     flex-direction: column;
@@ -16,13 +16,15 @@ html {
 
   .keys,
   .sliders,
-  .controls {
+  .controls,
+  .display,
+  .drum-buttons {
     display: flex;
     flex: 1;
     align-items: center;
     justify-content: space-evenly;
   }
-  
+
   .key {
     border: .4rem solid black;
     border-radius: .5rem;
@@ -36,28 +38,27 @@ html {
     background: rgba(0,0,0,0.4);
     text-shadow: 0 0 .5rem black;
   }
-  
+
   .playing {
     transform: scale(1.1);
     border-color: #ffc600;
     box-shadow: 0 0 1rem #ffc600;
   }
-  
+
   .armed {
     transform: scale(1.1);
     border-color: #c50f0f;
     box-shadow: 0 0 1rem #c50f0f;
   }
-  
+
   kbd {
     display: block;
     font-size: 2rem;
   }
-  
+
   .sound {
     font-size: 1.2rem;
     text-transform: uppercase;
     letter-spacing: .1rem;
     color: #ffc600;
   }
-  

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import 'normalize.css';
 import './app.css';
-import {ControlKey, DrumKey} from './keys';
+import { ControlKey } from './keys';
 import Pattern from './pattern';
 import Lcd from './lcd';
 import DrumData from './data';
+import Controls from './controls';
+import DrumButton from './drum-button';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let gainNode = null;
@@ -22,7 +24,7 @@ class App extends Component {
             tempo: 80,
             loop: false,
             loop_playing: false,
-            curbeat: 0,
+            current_beat: 0,
             pattern: loops[0],
             record_armed: false,
             armed_sound: ''
@@ -52,7 +54,7 @@ class App extends Component {
                 var request = new XMLHttpRequest();
                 request.open('GET', 'sounds/'+obj.sound, true);
                 request.responseType = 'arraybuffer';
-              
+
                 // Decode asynchronously
                 request.onload = function() {
                     audioContext.decodeAudioData(request.response, function(buffer) {
@@ -65,7 +67,7 @@ class App extends Component {
     }
 
     keySoundTrigger( e ) {
-        const key = document.querySelector( `.key[data-key="${e.keyCode}"]` );
+        const key = document.querySelector( `.drum-button_wrapper[data-key="${e.keyCode}"]` );
         if(!key) {
             return;
         }
@@ -83,14 +85,15 @@ class App extends Component {
                     this.setArmedSound( audio.name, key );
                 } else {
                     this.playSound(audio);
-                    key.classList.add('playing');
+                    const light = key.querySelector('.drum-light');
+                    light.classList.add('playing');
                 }
             }
         }
     }
 
     setArmedSound(name, key) {
-        const keys = Array.from( document.querySelectorAll('.keys .key') );
+        const keys = Array.from( document.querySelectorAll('.drum-buttons .drum-button_wrapper') );
         keys.forEach( (key) => key.classList.remove('armed') );
         key.classList.add('armed');
         this.setState({
@@ -100,7 +103,7 @@ class App extends Component {
 
     clickArmedSound( e ) {
         const kCode = e.currentTarget.dataset.key;
-        const key = document.querySelector( `.key[data-key="${kCode}"]` );
+        const key = document.querySelector( `.drum-button_wrapper[data-key="${kCode}"]` );
         const audio = sounds.find( (obj) => obj.kCode === Number.parseInt( kCode, 10 ) );
         this.setArmedSound( audio.name, key );
     }
@@ -110,7 +113,7 @@ class App extends Component {
             if(!this.state.loop) {
                 this.setState({
                     loop: !this.state.loop,
-                    curbeat: 0,
+                    current_beat: 0,
                     loop_playing: setInterval(this.playLoop, 60000 / this.state.tempo / 4)
                 });
                 key.classList.add('playing');
@@ -145,7 +148,7 @@ class App extends Component {
 
     playSound( sound, time = 0 ) {
         if(audioContext.state === 'suspended') {
-            audioContext.resume();  
+            audioContext.resume();
         }
 
         var source = audioContext.createBufferSource(); // creates a sound source
@@ -180,7 +183,7 @@ class App extends Component {
     playLoop() {
         if(this.state.loop) {
             //loop to play all sounds
-            this.state.pattern.loop[this.state.curbeat].forEach(soundName => {
+            this.state.pattern.loop[this.state.current_beat].forEach(soundName => {
                 const sound = sounds.find( (obj) =>  obj.name === soundName );
                 this.playSound(sound);
             } );
@@ -188,20 +191,20 @@ class App extends Component {
             //turn on/off time marker
             const prevPlayingEl = document.querySelector('.playing-now');
             if(prevPlayingEl) prevPlayingEl.classList.remove('playing-now');
-            const currentPlayingEl = document.querySelector(`.${this.state.pattern.style} .block-${this.state.curbeat}`);
+            const currentPlayingEl = document.querySelector(`.${this.state.pattern.style} .block-${this.state.current_beat}`);
             currentPlayingEl.classList.add('playing-now');
 
             this.setState({
-                curbeat : (this.state.curbeat + 1) % 8
+                current_beat : (this.state.current_beat + 1) % 8
             });
         }
-    } 
+    }
 
     addSoundToPattern( e ) {
         let checked_pattern = document.querySelectorAll('input[type="checkbox"]:checked')[0];
         let selected_sound = document.querySelector('.keys .key.armed');
         let current_time = e.currentTarget;
-        
+
         if( this.state.record_armed && checked_pattern.name ===  current_time.dataset.pattern ) {
             const sound_to_add = sounds.find( (obj) => obj.kCode === Number.parseInt( selected_sound.dataset.key, 10 ) );
             let loopPatternObj = loops.find( (obj) => obj.style === current_time.dataset.pattern );
@@ -226,13 +229,18 @@ class App extends Component {
     render() {
         return (
             <div className="wrapper">
-                <div className="controls">
+                <div className="display">
                     <Lcd />
                 </div>
-                <div className="keys">
-                    {sounds.map((obj, idx) => {
-                      return  <DrumKey key={idx} {...obj} clickArmedSound={this.clickArmedSound} />;
-                    })}
+                <div className="controls">
+                    <Controls />
+                </div>
+                <div className="controls">
+                    <div className="drum-buttons">
+                        {sounds.map((obj, idx) => {
+                        return  <DrumButton key={idx} {...obj} clickArmedSound={this.clickArmedSound} />;
+                        })}
+                    </div>
                 </div>
                 <div className="patterns">
                     {loops.map((obj, idx) => {
